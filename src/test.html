@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  
+</body>
+<script>
+  let test = {
+    name:'小红',
+    age: 12,
+    _name:this.name,
+  }
+  test = new Proxy(test,{
+    get(target,key){
+      console.log('获取了getter属性');
+      return Reflect.get(target,key)
+    },
+    set(target, key, value) {
+      if (key === "age" && typeof value !== "number") {
+        throw Error("age字段必须为Number类型");
+      }
+      return Reflect.set(target, key, value);
+    },
+    has(target,key){
+      if(!key.startsWith('_')){
+        return  true
+      }
+      return false;
+    },
+    ownKeys(target){
+      return Object.keys(target).filter(key => !key.startsWith('_'))
+    }
+  })
+  console.log(test.name);
+  // test.age = '15'
+  test.age = 15
+  console.log(test)
+  console.log('name' in test)
+  console.log('_name' in test)
+  console.log(Object.keys(test))
+  let user = {}
+  user = new Proxy(user, {
+    ownKeys(target){
+      return ['a','b','c']
+    },
+    getOwnPropertyDescriptor(target, prop) { // 被每个属性调用
+      return {
+        enumerable: true,
+        configurable: true
+        /* 其他属性，类似于 "value:..." */
+      };
+    }
+  })
+  console.log(Object.keys(user)) // Object.keys  for in 只会遍历 enumerable
+  // function delay(f,ms){
+  //   return function(){
+  //     console.log(this, arguments)
+  //     setTimeout(()=>{
+  //       console.log(this, arguments)
+  //       f.apply(this, arguments)
+  //     },ms)
+  //   }
+  // }
+  function delay(f,ms){
+    return new Proxy(f,{
+      apply(target, thisArg, arg){
+        setTimeout(()=>{
+          target.apply(thisArg, arg)
+        },ms)
+      }
+    })
+  }
+  function sayHi(user) {
+    console.log(`Hello, ${user}!`);
+  }
+  console.log(sayHi.length)
+  sayHi = delay(sayHi,3000)
+  console.log(sayHi.length)
+  sayHi('123')
+
+  // Function.prototype.bind = function(obj){
+  //   var fn = this;
+  //   var args = Array.prototype.slice.call(arguments, 1);
+  //   return function(){
+  //     fn.apply(obj, args)
+  //   }
+  // }
+  // ES6 call
+  Function.prototype.call_ = function (obj) {
+    obj = obj ? Object(obj) : window;
+    obj.fn = this;
+    // 利用拓展运算符直接将arguments转为数组
+    let args = [...arguments].slice(1);
+    let result = obj.fn(...args);
+    delete obj.fn
+    return result;
+  };
+// ES6 apply
+  Function.prototype.apply_ = function (obj, arr) {
+    obj = obj ? Object(obj) : window;
+    obj.fn = this;
+    let result;
+    if (!arr) {
+      result = obj.fn();
+    } else {
+      result = obj.fn(...arr);
+    };
+
+    delete obj.fn
+    return result;
+  };
+
+</script>
+</html>

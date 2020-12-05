@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .left{
+      position: absolute;
+    }
+    .right{
+      float:left;
+    }
+    .inside{
+      margin:10px 0px;
+      float: left;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <div class="demo">
+    <svg class="icon" aria-hidden="true">
+      <use xlink:href="#icondili"></use>
+    </svg>
+  </div>
+  <div class="container">
+    <div class="left">
+      <div class="top inside">top</div>
+      <div class="middle inside">middle</div>
+      <div class="bottom inside">bottom</div>
+    </div>
+    <div class="right">
+      <div class="top inside">top</div>
+      <div class="middle inside">middle</div>
+      <div class="bottom inside">bottom</div>
+    </div>
+  </div>
+</body>
+</html>
